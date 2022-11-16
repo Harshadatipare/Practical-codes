@@ -1,0 +1,427 @@
+# Fibonacci Series
+print("...Fibonacci series by non-recursion method...")
+a=int(input("Enter the first number of the series: "))
+b=int(input("Enter the second number of the series: "))
+n=int(input("Enter the number of terms needed: "))
+print(a,b,end="")
+while(n-2):
+    c=a+b
+    a=b
+    b=c
+    print(c,end="")
+    n=n-1
+    
+print("...Fibonacci series by recursion method...")
+def fibonacci(n):
+    if(n<=1):
+        return n
+    else:
+        return(fibonacci(n-1)+fibonacci(n-2))
+n=int(input("Enter the number of terms needed:"))
+print("Fibonacci series:")
+for i in range(n):
+    print(fibonacci(i),end="")
+    
+    
+#Huffmann Encoding
+import heapq
+class node:
+    def __init__(self,freq,symbol,left=None,right=None):
+        self.freq=freq
+        self.symbol=symbol
+        self.left=left
+        self.right=right
+        self.huff=''
+    
+    def __lt__(self,nxt):
+        return self.freq<nxt.freq
+    
+def printNodes(node,val=''):
+    newVal=val+str(node.huff)
+    if(node.left):
+        printNodes(node.left,newVal)
+    if(node.right):
+        printNodes(node.right,newVal)
+            
+    if(not node.left and not node.right):
+        print(f"{node.symbol}->{newVal}")
+            
+chars=['a','b','c','d','e','f']
+freq=[5,9,12,13,16,45]
+nodes=[]
+
+for x in range(len(chars)):
+    heapq.heappush(nodes,node(freq[x],chars[x]))
+    
+while len(nodes)>1:
+    left=heapq.heappop(nodes)
+    right=heapq.heappop(nodes)
+        
+    left.huff=0
+    right.huff=1
+        
+    newNode=node(left.freq+right.freq,left.symbol+right.symbol,left,right)
+    heapq.heappush(nodes,newNode)
+        
+    printNodes(nodes[0])
+        
+
+#o-1 knapSack
+def knapSack(W,wt,val,n):
+    K=[[0 for x in range(W+1)]for x in range(n+1)]
+    for i in range(n+1):
+        for w in range(W+1):
+            if i==0 or w==0:
+                K[i][w]=0
+            elif wt[i-1]<=w:
+                K[i][w]=max(val[i-1]+K[i-1][w-wt[i-1]],K[i-1][w])
+            else:
+                K[i][w]=K[i-1][w]
+    return K[n][W]
+
+val=[60,100,120]
+wt=[10,20,30]
+W=50
+n=len(val)
+print (knapSack(W,wt,val,n))
+
+
+#Fractional Knapsack
+class Item: 
+    def __init__(self, value, weight):
+        self.value=value
+        self.weight=weight
+        
+def fractionalKnapsack(W,arr):
+        arr.sort(key=lambda x:(x.value/x.weight),reverse=True)
+        finalvalue=0.0
+        
+        for item in arr:
+            if item.weight<=W:
+                W-=item.weight
+                finalvalue+=item.value
+            else:
+                finalvalue+=item.value*W/item.weight
+                break
+                
+        return finalvalue
+if __name__=="__main__":
+        W=50
+        arr=[Item(60,10),Item(100,20),Item(120,30)]
+        
+        max_val=fractionalKnapsack(W,arr)
+        print(max_val)
+        
+        
+#N queen problem
+global N
+N=4
+
+def printSolution(board):
+    for i in range(N):
+        for j in range(N):
+            print(board[i][j],end='')
+        print()
+        
+def isSafe(board,row,col):
+    for i in range(col):
+        if board[row][i]==1:
+            return False
+    for i,j in zip(range(row,-1,-1),range(col,-1,-1)):
+        if board[i][j]==1:
+            return False
+    for i,j in zip(range(row,N,1),range(col,-1,-1)):
+        if board[i][j]==1:
+            return False
+    return True
+    
+def solveNQUtil(board,col):
+    if col>=N:
+        return True
+    for i in range(N):
+        if isSafe(board,i,col):
+            board[i][col]=1
+            
+            if solveNQUtil(board,col+1)==True:
+                return True
+            board[i][col]=0
+    return False
+    
+def solveNQ():
+    board=[[0,0,0,0],
+           [0,0,0,0],
+           [0,0,0,0],
+           [0,0,0,0]]
+    
+    if solveNQUtil(board,0)==False:
+        print("Solution does not exist")
+        return False
+    
+    printSolution(board)
+    return True
+
+solveNQ()
+
+
+# Smart Contract Code
+pragma solidity >=0.7.0 <0.9.0;
+contract SimpleBank {
+struct client_account{
+int client_id;
+address client_address;
+uint client_balance_in_ether;
+}
+client_account[] clients;
+int clientCounter;
+address payable manager;
+modifier onlyManager() {
+require(msg.sender == manager, "Only manager can call this!");
+_;
+}
+modifier onlyClients() {
+    bool isclient = false;
+    for(uint i=0;i<clients.length;i++){
+        if(clients[i].client_address == msg.sender){
+            isclient = true;
+            break;
+}
+}
+require(isclient, "Only clients can call this!");
+_;
+}
+constructor() {
+clientCounter = 0;
+}
+receive() external payable { }
+function setManager(address managerAddress) public returns(string
+memory){
+    manager = payable(managerAddress);
+    return "";
+    }
+function joinAsClient() public payable returns(string memory){
+    clients.push(client_account(clientCounter++, msg.sender,
+address(msg.sender).balance));
+return "";
+}
+function deposit() public payable onlyClients{
+    payable(address(this)).transfer(msg.value);
+    }
+function withdraw(uint amount) public payable onlyClients{
+    payable(msg.sender).transfer(amount * 1 ether);
+    }
+function sendInterest() public payable onlyManager{
+    for(uint i=0;i<clients.length;i++){
+address initialAddress = clients[i].client_address;
+payable(initialAddress).transfer(1 ether);
+}
+}
+function getContractBalance() public view returns(uint){
+    return address(this).balance;
+}
+
+
+#BT Student Performance CRUD
+pragma solidity ^0.5.0;
+contract Crud {
+struct User {
+uint id;
+string name;
+}
+User[] public users;
+uint public nextId = 0;
+function Create(string memory name) public {
+users.push(User(nextId, name));
+nextId++;
+}
+function Read(uint id) view public returns(uint, string memory) {
+for(uint i=0; i<users.length; i++) {
+    if(users[i].id == id) {
+        return(users[i].id, users[i].name);
+}
+}
+}
+function Update(uint id, string memory name) public {
+for(uint i=0; i<users.length; i++) {
+    if(users[i].id == id) {
+        users[i].name =name;
+}
+}
+}
+function Delete(uint id) public {
+delete users[id];
+}
+function find(uint id) view internal returns(uint) {
+for(uint i=0; i< users.length; i++) {
+    if(users[i].id == id) {
+        return i;
+}
+}
+// if user does not exist then revert back
+revert("User does not exist");
+}
+}
+
+
+#ML UBER Datasets
+#Importing the required libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df  = pd.read_csv("/content/uber.csv")
+# Pre-process the dataset.
+df.head()
+df.info()
+df.columns
+df = df.drop(['Unnamed: 0', 'key'], axis= 1) 
+df.head()
+df.shape
+df.dtypes
+df.info()
+df.describe()
+df.isnull().sum() 
+
+df['dropoff_latitude'].fillna(value=df['dropoff_latitude'].mean(),inplace = True)
+df['dropoff_longitude'].fillna(value=df['dropoff_longitude'].median(),inplace = True)
+
+df['dropoff_latitude']
+
+df.head(10)
+
+df.isnull().sum() 
+df.dtypes
+
+df.pickup_datetime = pd.to_datetime(df.pickup_datetime,) 
+df.dtypes
+
+df= df.assign(hour = df.pickup_datetime.dt.hour,
+             day= df.pickup_datetime.dt.day,
+             month = df.pickup_datetime.dt.month,
+             year = df.pickup_datetime.dt.year,
+             dayofweek = df.pickup_datetime.dt.dayofweek)
+             
+df.head()
+# drop the column 'pickup_daetime' using drop()
+# 'axis = 1' drops the specified column
+
+df = df.drop('pickup_datetime',axis=1)
+
+df.head()
+df.dtypes
+
+Checking outliers and filling them
+df.plot(kind = "box",subplots = True,layout = (7,2),figsize=(15,20)) #Boxplot to check the outliers
+
+#Using the InterQuartile Range to fill the values
+def remove_outlier(df1 , col):
+    Q1 = df1[col].quantile(0.25)
+    Q3 = df1[col].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_whisker = Q1-1.5*IQR
+    upper_whisker = Q3+1.5*IQR
+    df[col] = np.clip(df1[col] , lower_whisker , upper_whisker)
+    return df1
+
+def treat_outliers_all(df1 , col_list):
+    for c in col_list:
+        df1 = remove_outlier(df , c)
+    return df1
+    
+df = treat_outliers_all(df , df.iloc[: , 0::])
+df.plot(kind = "box",subplots = True,layout = (7,2),figsize=(15,20))
+
+!pip install haversine
+import haversine as hs  #Calculate the distance using Haversine to calculate the distance between to points. Can't use Eucladian as it is for flat surface.
+travel_dist = []
+for pos in range(len(df['pickup_longitude'])):
+        long1,lati1,long2,lati2 = [df['pickup_longitude'][pos],df['pickup_latitude'][pos],df['dropoff_longitude'][pos],df['dropoff_latitude'][pos]]
+        loc1=(lati1,long1)
+        loc2=(lati2,long2)
+        c = hs.haversine(loc1,loc2)
+        travel_dist.append(c)
+    
+print(travel_dist)
+df['dist_travel_km'] = travel_dist
+df.head()
+
+travel_dist
+
+#Uber doesn't travel over 130 kms so minimize the distance 
+df= df.loc[(df.dist_travel_km >= 1) | (df.dist_travel_km <= 130)]
+print("Remaining observastions in the dataset:", df.shape)
+
+#Finding inccorect latitude (Less than or greater than 90) and longitude (greater than or less than 180)
+incorrect_coordinates = df.loc[(df.pickup_latitude > 90) |(df.pickup_latitude < -90) |
+                                   (df.dropoff_latitude > 90) |(df.dropoff_latitude < -90) |
+                                   (df.pickup_longitude > 180) |(df.pickup_longitude < -180) |
+                                   (df.dropoff_longitude > 180) |(df.dropoff_longitude < -180)
+                                    ]
+                                    
+ incorrect_coordinates
+ df.drop(incorrect_coordinates, inplace = True, errors = 'ignore')
+ df.head()
+ df.isnull().sum()
+ sns.heatmap(df.isnull()) #Free for null values
+ corr = df.corr() #Function to find the correlation
+ corr
+ fig,axis = plt.subplots(figsize = (10,6))
+sns.heatmap(df.corr(),annot = True) #Correlation Heatmap (Light values means highly correlated)
+
+Dividing the dataset into feature and target values
+x = df[['pickup_longitude','pickup_latitude','dropoff_longitude','dropoff_latitude','passenger_count','hour','day','month','year','dayofweek','dist_travel_km']]
+y = df['fare_amount']
+
+# Dividing the dataset into training and testing dataset
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_train,y_test = train_test_split(x,y,test_size = 0.40)
+
+X_train
+X_test
+y_train
+y_test
+
+LINEAR REGRESSION 
+from sklearn.linear_model import LinearRegression
+regression = LinearRegression()
+
+regression.fit(X_train,y_train)
+
+regression.intercept_ #To find the linear intercept
+
+regression.coef_ #To find the linear coeeficient
+
+prediction = regression.predict(X_test) #To predict the target values
+
+print(prediction)
+
+Metrics Evaluation using R2, Mean Squared Error, Root Mean Sqared Error
+from sklearn.metrics import r2_score
+r2_score(y_test,prediction)
+from sklearn.metrics import mean_squared_error
+MSE = mean_squared_error(y_test,prediction)
+MSE
+RMSE = np.sqrt(MSE)
+RMSE
+
+
+RANDOM FOREST REGRESSION 
+from sklearn.ensemble import RandomForestRegressor
+rf = RandomForestRegressor(n_estimators=50)
+rf.fit(X_train,y_train)
+y_pred = rf.predict(X_test)
+y_pred
+
+
+Metrics evaluatin for Random Forest
+R2_Random = r2_score(y_test,y_pred)
+R2_Random
+MSE_Random = mean_squared_error(y_test,y_pred)
+MSE_Random
+RMSE_Random = np.sqrt(MSE_Random)
+RMSE_Random
+
+
+
+
+
